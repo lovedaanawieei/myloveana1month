@@ -84,6 +84,17 @@
   /* ---------- flutuantes: corações e estrelas discretos ---------- */
   #floaties{ position: fixed; inset:0; z-index: 1; pointer-events:none; overflow:hidden; }
   .floaty{ position:absolute; opacity:.35; will-change: transform; }
+  /* nuvem feita só com CSS: um retângulo arredondado + dois "puffs"
+     redondos da mesma cor sólida, sem emendas visíveis nem formato estranho */
+  .floaty.cloud-shape{
+    width: 1.7em; height: 0.68em; border-radius: 1em;
+    background: currentColor;
+  }
+  .floaty.cloud-shape::before, .floaty.cloud-shape::after{
+    content:''; position:absolute; border-radius:50%; background: currentColor;
+  }
+  .floaty.cloud-shape::before{ width: 0.9em; height: 0.9em; top: -0.46em; left: 0.14em; }
+  .floaty.cloud-shape::after{ width: 0.66em; height: 0.66em; top: -0.28em; right: 0.2em; }
 
   /* ---------- nossa música (selo + player do Spotify) ---------- */
   #music-widget{
@@ -342,7 +353,6 @@
   .final-love{ font-family: var(--hand); font-weight:700; font-size: clamp(32px, 5vw, 50px); color: var(--rose-deep); }
   .final-sign{ font-family: var(--hand); font-size: 22px; color: var(--ink-soft); }
 
-  footer{ text-align:center; padding: 34px 0 44px; font-family: var(--note); font-size: 13px; color: var(--ink-soft); background: var(--paper-deep); }
 
   /* foco visível para acessibilidade */
   button:focus-visible, [tabindex]:focus-visible{ outline: 2px solid var(--rose-deep); outline-offset: 3px; }
@@ -479,8 +489,6 @@
   </div>
 </section>
 
-<footer>feito à mão, com tempo, cuidado e uma música ao fundo</footer>
-
 <script>
 /* ============================================================
    NOSSA MÚSICA — Spotify
@@ -613,22 +621,55 @@ document.getElementById('scroll-cue').addEventListener('click', () => {
    ============================================================ */
 (function floaties(){
   const wrap = document.getElementById('floaties');
-  const glyphs = ['♡','✦','☁'];
-  const count = window.innerWidth < 700 ? 10 : 18;
-  for (let i=0;i<count;i++){
+
+  // corações: continuam flutuando suavemente
+  const heartCount = window.innerWidth < 700 ? 7 : 12;
+  for (let i=0;i<heartCount;i++){
     const el = document.createElement('div');
     el.className = 'floaty';
-    el.textContent = glyphs[i % glyphs.length];
-    const size = 12 + Math.random()*16;
+    el.textContent = '♡';
+    el.style.fontSize = (12 + Math.random()*16) + 'px';
     el.style.left = Math.random()*100 + 'vw';
     el.style.top = Math.random()*100 + '%';
-    el.style.fontSize = size + 'px';
-    el.style.color = i % glyphs.length === 0 ? 'var(--rose)' : (i % glyphs.length === 1 ? 'var(--gold)' : 'var(--sage)');
+    el.style.color = 'var(--rose)';
+    el.style.setProperty('--peak', 0.45);
     el.style.animation = `floatUp ${16 + Math.random()*14}s linear ${Math.random()*-20}s infinite`;
     wrap.appendChild(el);
   }
+
+  // estrelas: paradas, em posições fixas, sem animação
+  const starSpots = window.innerWidth < 700
+    ? [ [12,6], [88,20], [60,32], [10,72] ]
+    : [ [5,8], [76,13], [4,44], [95,38], [40,80], [65,90] ];
+  starSpots.forEach(([left, top]) => {
+    const el = document.createElement('div');
+    el.className = 'floaty';
+    el.textContent = '✦';
+    el.style.fontSize = (13 + Math.random()*13) + 'px';
+    el.style.left = left + 'vw';
+    el.style.top = top + '%';
+    el.style.color = 'var(--gold)';
+    el.style.opacity = 0.45;
+    wrap.appendChild(el);
+  });
+
+  // nuvens: paradas, em algumas posições fixas, sem animação
+  const cloudSpots = window.innerWidth < 700
+    ? [ [8,14], [82,10], [18,88] ]
+    : [ [6,12], [88,8], [14,58], [92,66], [50,92] ];
+  cloudSpots.forEach(([left, top]) => {
+    const el = document.createElement('div');
+    el.className = 'floaty cloud-shape';
+    el.style.fontSize = (20 + Math.random()*12) + 'px';
+    el.style.left = left + 'vw';
+    el.style.top = top + '%';
+    el.style.color = 'var(--sage)';
+    el.style.opacity = 0.4;
+    wrap.appendChild(el);
+  });
+
   const style = document.createElement('style');
-  style.textContent = `@keyframes floatUp{ 0%{ transform: translateY(6vh) translateX(0) rotate(0deg); opacity:0; } 8%{ opacity:.4; } 92%{ opacity:.35; } 100%{ transform: translateY(-70vh) translateX(24px) rotate(20deg); opacity:0; } }`;
+  style.textContent = `@keyframes floatUp{ 0%{ transform: translateY(6vh) translateX(0) rotate(0deg); opacity:0; } 8%{ opacity: var(--peak, .4); } 92%{ opacity: var(--peak, .4); } 100%{ transform: translateY(-70vh) translateX(24px) rotate(20deg); opacity:0; } }`;
   document.head.appendChild(style);
 })();
 

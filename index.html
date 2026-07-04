@@ -622,20 +622,21 @@ document.getElementById('scroll-cue').addEventListener('click', () => {
 (function floaties(){
   const wrap = document.getElementById('floaties');
 
-  // corações: continuam flutuando suavemente
-  const heartCount = window.innerWidth < 700 ? 7 : 12;
-  for (let i=0;i<heartCount;i++){
+  // corações: parados, em posições fixas, sem animação
+  const heartSpots = window.innerWidth < 700
+    ? [ [20,10], [90,30], [8,50], [70,60], [30,85] ]
+    : [ [10,10], [95,15], [3,35], [80,45], [45,75], [92,88], [20,92] ];
+  heartSpots.forEach(([left, top]) => {
     const el = document.createElement('div');
     el.className = 'floaty';
     el.textContent = '♡';
-    el.style.fontSize = (12 + Math.random()*16) + 'px';
-    el.style.left = Math.random()*100 + 'vw';
-    el.style.top = Math.random()*100 + '%';
+    el.style.fontSize = (13 + Math.random()*14) + 'px';
+    el.style.left = left + 'vw';
+    el.style.top = top + '%';
     el.style.color = 'var(--rose)';
-    el.style.setProperty('--peak', 0.45);
-    el.style.animation = `floatUp ${16 + Math.random()*14}s linear ${Math.random()*-20}s infinite`;
+    el.style.opacity = 0.45;
     wrap.appendChild(el);
-  }
+  });
 
   // estrelas: paradas, em posições fixas, sem animação
   const starSpots = window.innerWidth < 700
@@ -667,10 +668,6 @@ document.getElementById('scroll-cue').addEventListener('click', () => {
     el.style.opacity = 0.4;
     wrap.appendChild(el);
   });
-
-  const style = document.createElement('style');
-  style.textContent = `@keyframes floatUp{ 0%{ transform: translateY(6vh) translateX(0) rotate(0deg); opacity:0; } 8%{ opacity: var(--peak, .4); } 92%{ opacity: var(--peak, .4); } 100%{ transform: translateY(-70vh) translateX(24px) rotate(20deg); opacity:0; } }`;
-  document.head.appendChild(style);
 })();
 
 /* ============================================================
